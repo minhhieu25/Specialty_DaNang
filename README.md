@@ -1,4 +1,4 @@
-- Quy ước đặt tên
+- Quy ước cài đặt và đặt tên trong dự án
   - Database:   SQL Server	2022
   - FarameWork: Django
   - Project Name:   Specialty_DaNang
