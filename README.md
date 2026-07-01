@@ -1,4 +1,4 @@
-- Quy ước đặt tên
+- Quy ước cài đặt và đặt tên trong dự án
 Database:   SQL Server 2022
 FarameWork: Django
 Project Name:   Specialty_DaNang
@@ -13,3 +13,5 @@ DB_SERVER = "127.0.0.1,1433"
 DB_USER = "sa"
 DB_PASSWORD = "YourSecurePassword"
 DB_NAME = "Specialty_DaNang_DB"
+
+
