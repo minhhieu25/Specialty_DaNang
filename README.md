@@ -1,17 +1,17 @@
 - Quy ước cài đặt và đặt tên trong dự án
-Database:   SQL Server 2022
-FarameWork: Django
-Project Name:   Specialty_DaNang
-Folder / Package: Viết thường toàn bộ, snake_case
-Class: PascalCase (Viết hoa chữ cái đầu)
-Variable (Biến): snake_case (Viết thường, cách nhau bằng _)
-Method / Function: snake_case
-Constant (Hằng số): UPPERCASE_SNAKE_CASE (Viết hoa toàn bộ)
+    - Database:   SQL Server 2022
+    - FarameWork: Django
+    - Project Name:   Specialty_DaNang
+    - Folder / Package: Viết thường toàn bộ, snake_case
+    - Class: PascalCase (Viết hoa chữ cái đầu)
+    - Variable (Biến): snake_case (Viết thường, cách nhau bằng _)
+    - Method / Function: snake_case
+    - Constant (Hằng số): UPPERCASE_SNAKE_CASE (Viết hoa toàn bộ)
 
 - Quy ước DB
-DB_SERVER = "127.0.0.1,1433"
-DB_USER = "sa"
-DB_PASSWORD = "YourSecurePassword"
-DB_NAME = "Specialty_DaNang_DB"
+    - DB_SERVER = "127.0.0.1,1433"
+    - DB_USER = "sa"
+    - DB_PASSWORD = "YourSecurePassword"
+    - DB_NAME = "Specialty_DaNang_DB"
 
 
