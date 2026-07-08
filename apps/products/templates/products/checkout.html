@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Thanh toán - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container cart-page">
+    <div class="cart-header-section">
+        <h1 class="cart-title">TIẾN HÀNH THANH TOÁN</h1>
+    </div>
+
+    <form method="post" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <div class="cart-layout">
+            <!-- Cột trái: Thông tin thanh toán -->
+            <div class="cart-items-section" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; margin-bottom: 20px; font-weight: 700; color: #333; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">THÔNG TIN NHẬN HÀNG</h3>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="full_name" style="display: block; margin-bottom: 8px; font-weight: 600;">Họ và tên *</label>
+                    <input type="text" id="full_name" name="full_name" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" placeholder="Nhập họ và tên đầy đủ" value="{{ request.user.username|default:'' }}">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="phone" style="display: block; margin-bottom: 8px; font-weight: 600;">Số điện thoại *</label>
+                    <input type="tel" id="phone" name="phone" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" placeholder="Nhập số điện thoại liên hệ">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="email" style="display: block; margin-bottom: 8px; font-weight: 600;">Email (Tùy chọn)</label>
+                    <input type="email" id="email" name="email" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" placeholder="Để nhận thông báo đơn hàng" value="{{ request.user.email|default:'' }}">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="address" style="display: block; margin-bottom: 8px; font-weight: 600;">Địa chỉ nhận hàng *</label>
+                    <textarea id="address" name="address" rows="3" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" placeholder="Nhập số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="note" style="display: block; margin-bottom: 8px; font-weight: 600;">Ghi chú đơn hàng (Tùy chọn)</label>
+                    <textarea id="note" name="note" rows="2" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" placeholder="Ghi chú thêm về thời gian giao hàng, yêu cầu đặc biệt..."></textarea>
+                </div>
+            </div>
+
+            <!-- Cột phải: Đơn hàng & Thanh toán -->
+            <div class="cart-summary-section">
+                <h2 class="summary-title">ĐƠN HÀNG CỦA BẠN</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    {% for item in cart %}
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                        <div>
+                            <strong>{{ item.product.name }}</strong> <span style="color: #888;">x{{ item.quantity }}</span>
+                        </div>
+                        <div style="font-weight: 600;">{{ item.total_price|floatformat:0|intcomma }} đ</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="summary-row">
+                    <span>Tạm tính</span>
+                    <span class="summary-val" id="subtotal" data-value="{{ cart.get_total_price }}">{{ cart.get_total_price|floatformat:0|intcomma }} đ</span>
+                </div>
+                
+                <div class="shipping-options" style="margin-top: 20px;">
+                    <span class="shipping-label" style="display: block; font-weight: 700; margin-bottom: 10px;">Phương thức vận chuyển</span>
+                    <div class="shipping-radio">
+                        <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; border: 1px solid #ddd; padding: 10px 15px; border-radius: 6px;">
+                            <input type="radio" name="shipping_fee" value="30000" onchange="updateTotal()" checked style="margin-right: 10px;"> 
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600;">Giao hàng Tiêu chuẩn</div>
+                                <div style="font-size: 13px; color: #666; margin-top: 2px;">Nhận hàng từ 2 - 4 ngày</div>
+                            </div>
+                            <div style="font-weight: 600; color: #d1561f;">30.000 đ</div>
+                        </label>
+                        <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; border: 1px solid #ddd; padding: 10px 15px; border-radius: 6px;">
+                            <input type="radio" name="shipping_fee" value="50000" onchange="updateTotal()" style="margin-right: 10px;"> 
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600;">Giao hàng Hỏa tốc</div>
+                                <div style="font-size: 13px; color: #666; margin-top: 2px;">Nhận hàng trong vòng 24 giờ</div>
+                            </div>
+                            <div style="font-weight: 600; color: #d1561f;">50.000 đ</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="summary-row total-row">
+                    <span>Tổng thanh toán</span>
+                    <span class="summary-val total-val" id="final-total">{{ cart.get_total_price|floatformat:0|intcomma }} đ</span>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px;">PHƯƠNG THỨC THANH TOÁN</h3>
+                    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 15px;">
+                            <input type="radio" name="payment_method" value="cod" checked style="margin-right: 10px;">
+                            <div>
+                                <div style="font-weight: 600;">Thanh toán khi nhận hàng (COD)</div>
+                                <div style="font-size: 13px; color: #666; margin-top: 4px;">Khách hàng thanh toán bằng tiền mặt khi bưu tá giao hàng tới.</div>
+                            </div>
+                        </label>
+                        
+                        <div style="border-top: 1px solid #eee; margin: 15px 0;"></div>
+                        
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="payment_method" value="bank_transfer" style="margin-right: 10px;">
+                            <div>
+                                <div style="font-weight: 600;">Chuyển khoản Ngân hàng / Momo</div>
+                                <div style="font-size: 13px; color: #666; margin-top: 4px;">Thực hiện thanh toán vào ngay tài khoản ngân hàng của chúng tôi. Vui lòng sử dụng Mã đơn hàng của bạn trong phần Nội dung thanh toán.</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-checkout" style="width: 100%; border: none; cursor: pointer;">ĐẶT HÀNG</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function updateTotal() {
+        // Lấy tạm tính
+        let subtotalStr = document.getElementById('subtotal').getAttribute('data-value');
+        let subtotal = parseInt(subtotalStr);
+        
+        // Lấy phí ship đang được chọn
+        let shippingRadios = document.getElementsByName('shipping_fee');
+        let shippingFee = 0;
+        for (let radio of shippingRadios) {
+            if (radio.checked) {
+                shippingFee = parseInt(radio.value);
+                break;
+            }
+        }
+        
+        // Tính tổng mới
+        let total = subtotal + shippingFee;
+        
+        // Format số tiền có dấu phẩy
+        let formattedTotal = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " đ";
+        
+        // Cập nhật giao diện
+        document.getElementById('final-total').innerText = formattedTotal;
+    }
+    
+    // Gọi hàm một lần khi load trang để hiển thị đúng ngay từ đầu
+    window.onload = function() {
+        updateTotal();
+    };
+</script>
+{% endblock %}

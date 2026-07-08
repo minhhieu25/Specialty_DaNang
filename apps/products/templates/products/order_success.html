@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Đặt hàng thành công - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 40px auto; text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <div style="font-size: 60px; color: #4CAF50; margin-bottom: 20px;">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <h1 style="color: #333; margin-bottom: 10px; font-weight: 800;">ĐẶT HÀNG THÀNH CÔNG!</h1>
+    <p style="color: #666; font-size: 16px; margin-bottom: 30px;">Cảm ơn bạn đã tin tưởng và mua sắm tại Hiếu Đặc Sản. Đơn hàng của bạn đã được ghi nhận.</p>
+    
+    <div style="background: #fdfaf5; border: 1px solid #f2e2d0; padding: 20px; border-radius: 8px; text-align: left; margin-bottom: 30px;">
+        <h3 style="margin-top: 0; color: #d1561f; font-weight: 700; border-bottom: 1px solid #f2e2d0; padding-bottom: 10px;">THÔNG TIN ĐƠN HÀNG</h3>
+        <p><strong>Mã đơn hàng:</strong> #{{ order.id }}</p>
+        <p><strong>Người nhận:</strong> {{ order.full_name }}</p>
+        <p><strong>Số điện thoại:</strong> {{ order.phone }}</p>
+        <p><strong>Địa chỉ giao hàng:</strong> {{ order.address }}</p>
+        <p><strong>Phương thức thanh toán:</strong> {{ order.get_payment_method_display }}</p>
+        <p><strong>Tổng thanh toán:</strong> <span style="color: #d1561f; font-weight: 700; font-size: 18px;">{{ order.total_price|floatformat:0|intcomma }} đ</span></p>
+    </div>
+
+    {% if order.payment_method == 'bank_transfer' %}
+    <div style="background: #e3f2fd; border: 1px solid #bbdefb; padding: 20px; border-radius: 8px; text-align: left; margin-bottom: 30px;">
+        <h3 style="margin-top: 0; color: #1976d2; font-weight: 700;">HƯỚNG DẪN CHUYỂN KHOẢN</h3>
+        <p>Vui lòng chuyển khoản số tiền <strong>{{ order.total_price|floatformat:0|intcomma }} đ</strong> vào tài khoản dưới đây:</p>
+        <ul style="list-style-type: none; padding-left: 0; margin-top: 15px;">
+            <li style="margin-bottom: 10px;"><strong>Ngân hàng:</strong> Vietcombank (Ngân hàng Ngoại thương Việt Nam)</li>
+            <li style="margin-bottom: 10px;"><strong>Số tài khoản:</strong> 1040754450</li>
+            <li style="margin-bottom: 10px;"><strong>Chủ tài khoản:</strong> VO MINH HIEU</li>
+            <li style="margin-bottom: 10px;"><strong>Nội dung CK:</strong> THANH TOAN DH {{ order.id }}</li>
+        </ul>
+        <p style="font-size: 13px; color: #555; margin-top: 15px; font-style: italic;">* Đơn hàng sẽ được xử lý ngay sau khi chúng tôi nhận được thanh toán.</p>
+    </div>
+    {% endif %}
+
+    <a href="{% url 'home' %}" class="btn-checkout" style="display: inline-block; text-decoration: none; padding: 12px 30px;">VỀ TRANG CHỦ</a>
+</div>
+{% endblock %}

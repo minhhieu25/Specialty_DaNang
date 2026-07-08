@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Đơn hàng của tôi - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div style="display: flex; gap: 30px;">
+        <!-- Cột trái: Menu Profile -->
+        <div class="profile-sidebar" style="width: 250px; flex-shrink: 0;">
+            <div style="background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 20px;">
+                <div style="display: flex; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                    <div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                        <i class="fas fa-user" style="font-size: 24px; color: #ccc;"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #333;">{{ request.user.username }}</div>
+                        <a href="{% url 'profile' %}" style="font-size: 13px; color: #888; text-decoration: none;"><i class="fas fa-pen"></i> Sửa hồ sơ</a>
+                    </div>
+                </div>
+                
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 15px;">
+                        <a href="{% url 'profile' %}" style="color: #555; text-decoration: none; font-weight: 500; display: flex; align-items: center;">
+                            <i class="fas fa-user-circle" style="width: 25px; color: #4CAF50;"></i> Hồ sơ của tôi
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 15px;">
+                        <a href="{% url 'my_orders' %}" style="color: #d1561f; text-decoration: none; font-weight: 700; display: flex; align-items: center;">
+                            <i class="fas fa-file-invoice-dollar" style="width: 25px;"></i> Đơn hàng của tôi
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 15px;">
+                        <a href="{% url 'change_password' %}" style="color: #555; text-decoration: none; font-weight: 500; display: flex; align-items: center;">
+                            <i class="fas fa-lock" style="width: 25px; color: #ff9800;"></i> Đổi mật khẩu
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Cột phải: Đơn hàng -->
+        <div class="orders-content" style="flex: 1;">
+            <h2 style="color: #333; margin-top: 0; margin-bottom: 25px; font-weight: 700; font-size: 24px;">ĐƠN HÀNG CỦA TÔI</h2>
+
+            {% if orders %}
+                {% for order in orders %}
+                <div class="order-card" style="background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 25px;">
+                    <!-- Header Đơn hàng -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                        <div>
+                            <span style="font-weight: 700; color: #333; font-size: 16px;">Mã đơn: #{{ order.id }}</span>
+                            <span style="color: #888; font-size: 14px; margin-left: 15px;"> Đặt lúc: {{ order.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div>
+                            {% if order.status == 'pending' %}
+                                <span style="background: #fff3cd; color: #856404; padding: 5px 12px; border-radius: 4px; font-size: 13px; font-weight: 600;"><i class="fas fa-clock"></i> Chờ xử lý</span>
+                            {% elif order.status == 'processing' %}
+                                <span style="background: #cce5ff; color: #004085; padding: 5px 12px; border-radius: 4px; font-size: 13px; font-weight: 600;"><i class="fas fa-box"></i> Đang chuẩn bị hàng</span>
+                            {% elif order.status == 'shipped' %}
+                                <span style="background: #e2e3e5; color: #383d41; padding: 5px 12px; border-radius: 4px; font-size: 13px; font-weight: 600;"><i class="fas fa-truck"></i> Đang giao hàng</span>
+                            {% elif order.status == 'delivered' %}
+                                <span style="background: #d4edda; color: #155724; padding: 5px 12px; border-radius: 4px; font-size: 13px; font-weight: 600;"><i class="fas fa-check-circle"></i> Đã giao</span>
+                            {% elif order.status == 'cancelled' %}
+                                <span style="background: #f8d7da; color: #721c24; padding: 5px 12px; border-radius: 4px; font-size: 13px; font-weight: 600;"><i class="fas fa-times-circle"></i> Đã hủy</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Danh sách sản phẩm -->
+                    <div class="order-items">
+                        {% for item in order.items.all %}
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 80px; height: 80px; border: 1px solid #eee; border-radius: 4px; overflow: hidden; margin-right: 15px;">
+                                {% if item.product and item.product.image %}
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static 'images/placeholder.jpg' %}" alt="No Image" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #333; font-size: 15px; margin-bottom: 5px;">{{ item.product.name|default:"Sản phẩm đã bị xóa" }}</div>
+                                <div style="color: #666; font-size: 14px;">x{{ item.quantity }}</div>
+                            </div>
+                            <div style="font-weight: 600; color: #d1561f;">
+                                {{ item.price|floatformat:0|intcomma }} đ
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div style="border-top: 1px solid #eee; margin: 15px 0;"></div>
+
+                    <!-- Thông tin giao hàng & Tổng tiền -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px; padding-right: 20px;">
+                            <div style="margin-bottom: 8px;"><strong style="color: #555;"><i class="fas fa-map-marker-alt" style="color: #d1561f; width: 20px;"></i> Địa chỉ giao hàng:</strong> <span style="color: #333;">{{ order.address }}</span></div>
+                            <div style="margin-bottom: 8px;"><strong style="color: #555;"><i class="far fa-calendar-check" style="color: #4CAF50; width: 20px;"></i> Dự kiến giao:</strong> <span style="color: #333; font-weight: 600;">{{ order.estimated_delivery|date:"d/m/Y" }}</span></div>
+                            <div style="margin-bottom: 8px;"><strong style="color: #555;"><i class="fas fa-wallet" style="color: #2196F3; width: 20px;"></i> Thanh toán:</strong> <span style="color: #333;">{{ order.get_payment_method_display }}</span></div>
+                        </div>
+                        <div style="text-align: right; min-width: 200px;">
+                            <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Phí vận chuyển: <span style="color: #333; font-weight: 600;">{{ order.shipping_fee|floatformat:0|intcomma }} đ</span></div>
+                            <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Thành tiền:</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #d1561f;">{{ order.total_price|floatformat:0|intcomma }} đ</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nút thao tác -->
+                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+                        {% if order.status == 'pending' or order.status == 'processing' %}
+                            <button type="button" onclick="openCancelModal({{ order.id }})" style="padding: 10px 20px; border: 1px solid #dc3545; border-radius: 4px; background: white; color: #dc3545; font-weight: 600; cursor: pointer; transition: all 0.2s;"><i class="fas fa-times"></i> Hủy đơn hàng</button>
+                        {% endif %}
+                        <button type="button" onclick="openReturnModal({{ order.id }})" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; background: white; color: #555; font-weight: 600; cursor: pointer; transition: all 0.2s;"><i class="fas fa-undo"></i> Trả hàng / Hoàn tiền</button>
+                        <a href="{% url 'contact' %}" style="padding: 10px 20px; background: #d1561f; border-radius: 4px; color: white; text-decoration: none; font-weight: 600; transition: all 0.2s;"><i class="fas fa-comment-dots"></i> Liên hệ người bán</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; background: white; padding: 50px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <i class="fas fa-shopping-bag" style="font-size: 60px; color: #e0e0e0; margin-bottom: 20px;"></i>
+                    <h3 style="color: #666; margin-bottom: 20px;">Chưa có đơn hàng</h3>
+                    <p style="color: #999; margin-bottom: 25px;">Bạn chưa mua sản phẩm nào từ Hiếu Đặc Sản.</p>
+                    <a href="{% url 'product_list' %}" class="btn-checkout" style="display: inline-block; text-decoration: none; padding: 10px 25px;">MUA SẮM NGAY</a>
+                </div>
+            {% endif %}
+
+            <!-- Gợi ý sản phẩm -->
+            {% if recommended_products %}
+            <div style="margin-top: 50px;">
+                <h3 style="color: #333; font-weight: 700; border-bottom: 2px solid #d1561f; display: inline-block; padding-bottom: 8px; margin-bottom: 20px;">CÓ THỂ BẠN CŨNG THÍCH</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+                    {% for p in recommended_products %}
+                    <div class="product-card" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s;">
+                        <a href="{% url 'product_detail' p.slug %}">
+                            <div style="height: 200px; overflow: hidden;">
+                                {% if p.image %}
+                                    <img src="{{ p.image.url }}" alt="{{ p.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
+                            </div>
+                        </a>
+                        <div style="padding: 15px;">
+                            <a href="{% url 'product_detail' p.slug %}" style="text-decoration: none; color: #333;">
+                                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; height: 42px;">{{ p.name }}</h4>
+                            </a>
+                            <div style="color: #d1561f; font-weight: 700; font-size: 16px;">{{ p.price|floatformat:0|intcomma }} đ</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal Trả hàng / Hoàn tiền -->
+<div id="returnModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h3 style="margin: 0; color: #d1561f; font-weight: 700;">Yêu cầu Trả hàng / Hoàn tiền</h3>
+            <button type="button" onclick="closeReturnModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">&times;</button>
+        </div>
+        <form action="" method="POST" id="returnForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="return_order">
+            <input type="hidden" name="order_id" id="modalOrderId">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Lý do trả hàng *</label>
+                <select name="reason" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">-- Chọn lý do --</option>
+                    <option value="Sản phẩm bị lỗi/hư hỏng">Sản phẩm bị lỗi/hư hỏng</option>
+                    <option value="Giao sai sản phẩm">Giao sai sản phẩm</option>
+                    <option value="Thiếu hàng">Thiếu hàng</option>
+                    <option value="Khác">Lý do khác</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Chi tiết thêm (Tùy chọn)</label>
+                <textarea name="details" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Mô tả cụ thể vấn đề bạn gặp phải..."></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button type="button" onclick="closeReturnModal()" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; margin-right: 10px;">Hủy</button>
+                <button type="submit" style="padding: 10px 20px; border: none; border-radius: 4px; background: #d1561f; color: white; font-weight: 600; cursor: pointer;">Gửi yêu cầu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Hủy đơn hàng -->
+<div id="cancelModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h3 style="margin: 0; color: #dc3545; font-weight: 700;">Hủy đơn hàng</h3>
+            <button type="button" onclick="closeCancelModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">&times;</button>
+        </div>
+        <form action="" method="POST" id="cancelForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="cancel_order">
+            <input type="hidden" name="order_id" id="cancelModalOrderId">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #555;">Lý do hủy đơn *</label>
+                <select name="cancel_reason" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">-- Chọn lý do --</option>
+                    <option value="Muốn thay đổi địa chỉ giao hàng">Muốn thay đổi địa chỉ giao hàng</option>
+                    <option value="Muốn thay đổi sản phẩm">Muốn thay đổi sản phẩm</option>
+                    <option value="Tìm thấy giá rẻ hơn chỗ khác">Tìm thấy giá rẻ hơn chỗ khác</option>
+                    <option value="Đổi ý, không muốn mua nữa">Đổi ý, không muốn mua nữa</option>
+                    <option value="Khác">Lý do khác</option>
+                </select>
+            </div>
+            <div style="text-align: right;">
+                <button type="button" onclick="closeCancelModal()" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; margin-right: 10px;">Đóng</button>
+                <button type="submit" style="padding: 10px 20px; border: none; border-radius: 4px; background: #dc3545; color: white; font-weight: 600; cursor: pointer;">Xác nhận hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openReturnModal(orderId) {
+        document.getElementById('modalOrderId').value = orderId;
+        document.getElementById('returnModal').style.display = 'flex';
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReturnModal() {
+        document.getElementById('returnModal').style.display = 'none';
+        // Restore body scroll
+        document.body.style.overflow = 'auto';
+    }
+
+    function openCancelModal(orderId) {
+        document.getElementById('cancelModalOrderId').value = orderId;
+        document.getElementById('cancelModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCancelModal() {
+        document.getElementById('cancelModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+</script>
+{% endblock %}

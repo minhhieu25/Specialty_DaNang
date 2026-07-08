@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hồ sơ cá nhân - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div class="profile-layout" style="display: flex; gap: 30px;">
+        <!-- Cột trái: Sidebar Menu -->
+        <div class="profile-sidebar" style="width: 250px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: fit-content;">
+            <div class="text-center" style="text-align: center; margin-bottom: 20px;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: #d1561f; color: #fff; font-size: 32px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+                <h3 style="font-size: 18px; color: #333; font-weight: 700;">{{ user.username }}</h3>
+            </div>
+            
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 10px;">
+                    <a href="{% url 'profile' %}" style="display: block; padding: 10px 15px; border-radius: 6px; background: #fdf2e1; color: #d1561f; font-weight: 600; text-decoration: none;">
+                        <i class="fas fa-user" style="margin-right: 10px;"></i> Hồ sơ của tôi
+                    </a>
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <a href="{% url 'cart_detail' %}" style="display: block; padding: 10px 15px; border-radius: 6px; color: #555; text-decoration: none; transition: background 0.2s;">
+                        <i class="fas fa-shopping-cart" style="margin-right: 10px;"></i> Giỏ hàng
+                    </a>
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <a href="{% url 'change_password' %}" style="display: block; padding: 10px 15px; border-radius: 6px; color: #555; text-decoration: none; transition: background 0.2s;">
+                        <i class="fas fa-lock" style="margin-right: 10px;"></i> Đổi mật khẩu
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'logout' %}" style="display: block; padding: 10px 15px; border-radius: 6px; color: #e74c3c; text-decoration: none; transition: background 0.2s;">
+                        <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Cột phải: Form Thông tin -->
+        <div class="profile-content" style="flex: 1; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h2 style="color: #d1561f; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 25px; font-weight: 700;">HỒ SƠ CỦA TÔI</h2>
+            <p style="color: #666; margin-bottom: 25px;">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+
+
+
+            <form action="{% url 'profile' %}" method="POST" style="max-width: 500px;">
+                {% csrf_token %}
+                
+                <div style="margin-bottom: 20px; display: flex; align-items: center;">
+                    <label style="width: 150px; color: #555; font-weight: 600;">Tên đăng nhập</label>
+                    <div style="flex: 1; color: #333; font-weight: 700;">{{ user.username }}</div>
+                </div>
+
+                <div style="margin-bottom: 20px; display: flex; align-items: center;">
+                    <label style="width: 150px; color: #555; font-weight: 600;">Họ</label>
+                    <div style="flex: 1;">
+                        <input type="text" name="last_name" value="{{ user.last_name }}" class="auth-input-plain" style="width: 100%; border: 1px solid #ddd;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px; display: flex; align-items: center;">
+                    <label style="width: 150px; color: #555; font-weight: 600;">Tên</label>
+                    <div style="flex: 1;">
+                        <input type="text" name="first_name" value="{{ user.first_name }}" class="auth-input-plain" style="width: 100%; border: 1px solid #ddd;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px; display: flex; align-items: center;">
+                    <label style="width: 150px; color: #555; font-weight: 600;">Email</label>
+                    <div style="flex: 1;">
+                        <input type="email" name="email" value="{{ user.email }}" class="auth-input-plain" style="width: 100%; border: 1px solid #ddd;" required>
+                    </div>
+                </div>
+
+                <div style="margin-left: 150px;">
+                    <button type="submit" class="btn-auth" style="padding: 10px 25px;">LƯU THAY ĐỔI</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

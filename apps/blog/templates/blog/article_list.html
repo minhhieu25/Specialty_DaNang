@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tin tức & Sự kiện - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container blog-page">
+    <div class="blog-header-section">
+        <h1 class="blog-main-title">Tin tức &<br>sự kiện</h1>
+    </div>
+    
+    <div class="blog-toolbar">
+        <div class="blog-filter">
+            <span class="filter-label">Các tin tức mới nhất</span>
+            <div class="dropdown-filter" style="position: relative; display: inline-block;">
+                <button class="btn-filter" onclick="document.getElementById('catDropdown').classList.toggle('show')">
+                    {% if current_category %}{{ current_category.name }}{% else %}Tất cả danh mục{% endif %} <i class="fas fa-chevron-down"></i>
+                </button>
+                <div id="catDropdown" class="dropdown-content" style="display: none; position: absolute; background-color: #f9f9f9; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;">
+                    <a href="{% url 'blog_list' %}" style="color: black; padding: 12px 16px; text-decoration: none; display: block;">Tất cả danh mục</a>
+                    {% for cat in categories %}
+                        <a href="?category={{ cat.slug }}" style="color: black; padding: 12px 16px; text-decoration: none; display: block;">{{ cat.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <style>
+                .dropdown-content a:hover {background-color: #f1f1f1;}
+                .show {display:block !important;}
+            </style>
+        </div>
+        
+        <div class="blog-search">
+            <form action="#" method="GET">
+                <input type="text" name="q" placeholder="Tìm kiếm...">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="blog-content-layout">
+        {% if featured_article %}
+        <div class="blog-featured">
+            <div class="featured-card">
+                <a href="{% url 'blog_detail' featured_article.slug %}" class="article-link">
+                    {% if featured_article.image %}
+                        <img src="{{ featured_article.image.url }}" alt="{{ featured_article.title }}" class="featured-img">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.jpg' %}" alt="{{ featured_article.title }}" class="featured-img">
+                    {% endif %}
+                    
+                    <h2 class="featured-title">{{ featured_article.title }}</h2>
+                    <span class="article-category">
+                        {% if featured_article.category %}{{ featured_article.category.name }}{% endif %}
+                    </span>
+                    <p class="featured-excerpt">{{ featured_article.excerpt }}</p>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="blog-list">
+            {% for article in other_articles %}
+            <div class="article-list-item">
+                <a href="{% url 'blog_detail' article.slug %}" class="article-list-link">
+                    <div class="article-list-img-wrapper">
+                        {% if article.image %}
+                            <img src="{{ article.image.url }}" alt="{{ article.title }}">
+                        {% else %}
+                            <img src="{% static 'images/placeholder.jpg' %}" alt="{{ article.title }}">
+                        {% endif %}
+                    </div>
+                    <div class="article-list-info">
+                        <h3 class="article-list-title">{{ article.title }}</h3>
+                        <span class="article-category">
+                            {% if article.category %}{{ article.category.name }}{% endif %}
+                        </span>
+                        <p class="article-list-excerpt">{{ article.excerpt }}</p>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p>Đang cập nhật tin tức.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

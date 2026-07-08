@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container product-detail-page">
+    <div class="breadcrumb">
+        <a href="{% url 'product_list' %}">SẢN PHẨM</a> &rarr; <span>CHI TIẾT SẢN PHẨM</span>
+    </div>
+
+    <div class="product-detail-container">
+        <!-- Left Column: Images -->
+        <div class="product-gallery">
+            <div class="main-image">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainProductImg">
+                {% else %}
+                    <img src="{% static 'images/placeholder.jpg' %}" alt="{{ product.name }}" id="mainProductImg">
+                {% endif %}
+                <button class="gallery-nav prev"><i class="fas fa-arrow-left"></i></button>
+                <button class="gallery-nav next"><i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <div class="thumbnail-list">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="Thumbnail 1" class="thumbnail active" onclick="changeImage(this)">
+                {% endif %}
+                {% for image_obj in product.images.all %}
+                    <img src="{{ image_obj.image.url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage(this)">
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right Column: Info -->
+        <div class="product-info-panel">
+            <h1 class="detail-title">{{ product.name }}{% if product.is_best_seller %} (Best Seller){% endif %}</h1>
+            <div class="detail-price">{{ product.price }} VNĐ</div>
+            
+            <p class="detail-short-desc">
+                {{ product.short_description|default:"" }}
+            </p>
+            
+            <div class="detail-divider"></div>
+            
+            <div class="detail-stock">
+                còn {{ product.stock }} hàng (có thể đặt hàng trước)
+            </div>
+            
+            <form action="{% url 'cart_add' product.id %}" method="post">
+                {% csrf_token %}
+                <div class="detail-quantity">
+                    <span>Số lượng:</span>
+                    <div class="quantity-selector">
+                        <button type="button" class="btn-qty" onclick="changeQty(-1)">-</button>
+                        <input type="number" id="qty" name="quantity" value="1" min="1" max="{{ product.stock|default:99 }}">
+                        <button type="button" class="btn-qty" onclick="changeQty(1)">+</button>
+                    </div>
+                    {% if product.stock %}
+                        <span class="stock-info">({{ product.stock }} sản phẩm có sẵn)</span>
+                    {% endif %}
+                </div>
+
+                <div class="detail-actions">
+                    <button type="submit" class="btn btn-add-cart">THÊM VÀO GIỎ HÀNG</button>
+                    <!-- Tạm thời Mua ngay cũng đẩy vào giỏ hàng và chuyển hướng sang giỏ hàng -->
+                    <button type="submit" class="btn btn-buy-now">MUA NGAY</button>
+                </div>
+            </form>
+            
+            {% if product.promotions.exists %}
+            <div class="promotions-section">
+                <h3 class="promotions-title">Khuyến Mãi</h3>
+                <ul class="promotions-list">
+                    {% for promo in product.promotions.all %}
+                    <li>
+                        <span class="promo-number">{{ forloop.counter }}</span>
+                        {{ promo.content }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Long Description -->
+    <div class="product-long-description">
+        <h2 class="section-title-line"><span>THÔNG TIN SẢN PHẨM</span></h2>
+        
+        <div class="info-box description-box">
+            <h3 class="info-box-title">{{ product.name }}</h3>
+            <div class="description-content">
+                {% if product.description %}
+                    {{ product.description|safe|linebreaks }}
+                {% else %}
+                    <p>Đang cập nhật thông tin chi tiết.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="info-box review-box">
+            <h3 class="info-box-title">Đánh giá và nhận xét ({{ product.reviews.count }})</h3>
+            
+            <div class="review-form-section">
+                <h4>Đánh giá của bạn</h4>
+                <form action="{% url 'add_review' product.id %}" method="POST" class="review-form">
+                    {% csrf_token %}
+                    <div class="star-rating-input">
+                        <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"><i class="far fa-star"></i></label>
+                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="far fa-star"></i></label>
+                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="far fa-star"></i></label>
+                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="far fa-star"></i></label>
+                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="far fa-star"></i></label>
+                    </div>
+                    <div class="review-input-wrapper" style="display: flex; gap: 10px; margin-top: 15px;">
+                        <input type="text" name="content" placeholder="Nhận xét của bạn" class="review-text-input" required style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <button type="submit" style="padding: 10px 20px; background-color: #d1561f; color: white; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">Gửi đánh giá</button>
+                    </div>
+                </form>
+            </div>
+            
+            <hr class="review-divider">
+            
+            <div class="review-list">
+                <h4>Nhận xét của khách hàng</h4>
+                {% for review in product.reviews.all %}
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="review-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="review-meta">
+                            <span class="reviewer-name">{{ review.customer_name }}</span>
+                            <span class="review-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="review-time">{{ review.created_at|date:"H:i:s Y-m-d" }}</span>
+                        </div>
+                    </div>
+                    <div class="review-content-box">
+                        {{ review.content }}
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: #777; font-size: 14px;">Chưa có nhận xét nào.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function changeImage(imgElement) {
+        // Change main image
+        document.getElementById('mainProductImg').src = imgElement.src;
+        
+        // Update active class
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(t => t.classList.remove('active'));
+        imgElement.classList.add('active');
+    }
+
+    function changeQty(change) {
+        let qtyInput = document.getElementById('qty');
+        let current = parseInt(qtyInput.value) || 1;
+        let min = parseInt(qtyInput.getAttribute('min')) || 1;
+        let max = parseInt(qtyInput.getAttribute('max')) || 99;
+        
+        let newVal = current + change;
+        if (newVal >= min && newVal <= max) {
+            qtyInput.value = newVal;
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

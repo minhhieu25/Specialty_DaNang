@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Giỏ Hàng - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container cart-page">
+    <div class="cart-header-section">
+        <h1 class="cart-title">GIỎ HÀNG &rarr; CHI TIẾT THANH TOÁN</h1>
+    </div>
+
+    {% if cart|length > 0 %}
+    <div class="cart-layout">
+        <!-- Cột trái: Chi tiết sản phẩm trong giỏ -->
+        <div class="cart-items-section">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>SẢN PHẨM</th>
+                        <th>GIÁ</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>TẠM TÍNH</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    {% with product=item.product %}
+                    <tr>
+                        <td class="product-col">
+                            <form action="{% url 'cart_remove' product.id %}" method="post" class="remove-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-remove" title="Xóa khỏi giỏ hàng"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                            
+                            <div class="cart-product-info">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="cart-item-img">
+                                {% else %}
+                                    <img src="{% static 'images/placeholder.jpg' %}" alt="{{ product.name }}" class="cart-item-img">
+                                {% endif %}
+                                <span class="cart-item-name">{{ product.name }}</span>
+                            </div>
+                        </td>
+                        <td class="price-col">{{ item.price }}</td>
+                        <td class="qty-col">
+                            <form action="{% url 'cart_add' product.id %}" method="post" class="update-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="update" value="True">
+                                <div class="quantity-selector">
+                                    <button type="button" class="btn-qty btn-minus" onclick="updateQty(this, -1)">-</button>
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="qty-input">
+                                    <button type="button" class="btn-qty btn-plus" onclick="updateQty(this, 1)">+</button>
+                                </div>
+                                <button type="submit" class="btn-update-qty" style="display:none;">Cập nhật</button>
+                            </form>
+                        </td>
+                        <td class="subtotal-col">{{ item.total_price }}</td>
+                    </tr>
+                    {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="cart-actions">
+                <a href="{% url 'product_list' %}" class="btn-continue-shopping">&larr; TIẾP TỤC XEM SẢN PHẨM</a>
+                <!-- The update all button is just for UI here, usually handled via form submit -->
+                <button type="button" class="btn-update-cart" onclick="document.querySelectorAll('.btn-update-qty').forEach(b => b.click())">CẬP NHẬT GIỎ HÀNG</button>
+            </div>
+        </div>
+
+        <!-- Cột phải: Tổng cộng giỏ hàng -->
+        <div class="cart-summary-section">
+            <h2 class="summary-title">TỔNG CỘNG GIỎ HÀNG</h2>
+            
+            <div class="summary-row total-row">
+                <span>Tổng tiền sản phẩm</span>
+                <span class="summary-val total-val" id="final-total">{{ cart.get_total_price }}</span>
+            </div>
+            
+            <p class="shipping-note" style="margin-bottom: 20px; font-size: 13px; color: #666;">* Phí vận chuyển sẽ được tính ở trang thanh toán.</p>
+            
+            <a href="{% url 'checkout' %}" class="btn-checkout" style="display: block; text-align: center; text-decoration: none;">TIẾN HÀNH THANH TOÁN</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <p>Giỏ hàng của bạn đang trống.</p>
+        <a href="{% url 'product_list' %}" class="btn-continue-shopping" style="margin-top: 20px; display: inline-block;">TIẾP TỤC XEM SẢN PHẨM</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Basic JS to handle quantity +/-, and update the hidden form
+    function updateQty(btn, change) {
+        let input = btn.parentElement.querySelector('.qty-input');
+        let newVal = parseInt(input.value) + change;
+        if (newVal >= 1) {
+            input.value = newVal;
+            // Submit the closest form
+            btn.closest('.update-form').submit();
+        }
+    }
+</script>
+{% endblock %}

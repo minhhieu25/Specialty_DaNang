@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đăng Nhập - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <!-- Cột trái: Ảnh nền -->
+        <div class="auth-left">
+            <div class="auth-logo-overlay">
+                <img src="{% static 'images/logo.png' %}" alt="Logo Hiếu Đặc Sản">
+            </div>
+        </div>
+        
+        <!-- Cột phải: Form -->
+        <div class="auth-right">
+            <h2 class="auth-title">ĐĂNG NHẬP</h2>
+            
+
+
+            <form action="{% url 'login' %}" method="POST" class="auth-form">
+                {% csrf_token %}
+                
+                <div class="input-group">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" name="username" placeholder="Tên đăng nhập" required class="auth-input">
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" name="password" id="password" placeholder="Mật Khẩu" required class="auth-input">
+                    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password', this)"></i>
+                </div>
+                
+                <div class="auth-actions">
+                    <a href="#" class="forgot-link">Quên mật khẩu?</a>
+                    <button type="submit" class="btn-auth">ĐĂNG NHẬP</button>
+                </div>
+                
+                <div class="auth-switch">
+                    Chưa có tài khoản? <a href="{% url 'register' %}" class="switch-link">ĐĂNG KÝ</a>
+                </div>
+            </form>
+            
+            <div class="social-login-section">
+                <div class="social-text">Hoặc đăng nhập với</div>
+                <div class="social-buttons">
+                    <a href="#" class="btn-social btn-google">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google"> Google
+                    </a>
+                    <a href="#" class="btn-social btn-facebook">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook"> Facebook
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword(inputId, icon) {
+        var input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            input.type = "password";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    }
+</script>
+{% endblock %}

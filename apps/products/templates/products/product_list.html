@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sản Phẩm - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="container products-page">
+    <div class="products-layout">
+        <!-- Sidebar Danh mục -->
+        <aside class="category-sidebar">
+            <h3 class="sidebar-title">DANH MỤC SẢN PHẨM</h3>
+            <ul class="category-list">
+                <li>
+                    <a href="{% url 'product_list' %}" class="{% if not current_category %}active{% endif %}">
+                        Tất cả sản phẩm
+                    </a>
+                </li>
+                {% for category in categories %}
+                <li>
+                    <a href="{% url 'product_list_by_category' category.slug %}" class="{% if current_category.slug == category.slug %}active{% endif %}">
+                        {{ category.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <!-- Product Grid -->
+        <div class="product-main-area">
+            <div class="product-grid list-page-grid">
+                {% for product in products %}
+                <div class="product-card list-page-card">
+                    <a href="{% url 'product_detail' product.slug %}" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="product-image-wrapper">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                            {% else %}
+                                <img src="{% static 'images/placeholder.jpg' %}" alt="{{ product.name }}" class="product-image">
+                            {% endif %}
+                        </div>
+                        <h3 class="product-title list-page-title">{{ product.name }}</h3>
+                    </a>
+                    <div class="product-footer list-page-footer">
+                        <span class="product-price list-page-price">{{ product.price }} VNĐ</span>
+                        <div class="list-page-actions">
+                            <form action="{% url 'cart_add' product.id %}" method="post" style="display: flex; gap: 10px;">
+                                {% csrf_token %}
+                                <div class="quantity-selector" style="display: none;">
+                                    <input type="hidden" name="quantity" value="1">
+                                </div>
+                                <button type="submit" class="cart-btn" title="Giỏ hàng"><i class="fas fa-shopping-cart"></i></button>
+                                <button type="submit" class="order-btn">Đặt Hàng</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="text-align: center; grid-column: 1 / -1; color: #666; padding: 50px;">Chưa có sản phẩm nào trong danh mục này.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="pagination-wrapper">
+                <div class="pagination-pill">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-arrow"><i class="fas fa-arrow-left"></i></a>
+                    {% else %}
+                    <span class="page-arrow disabled"><i class="fas fa-arrow-left"></i></span>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="page-number active">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}" class="page-number">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="page-arrow"><i class="fas fa-arrow-right"></i></a>
+                    {% else %}
+                    <span class="page-arrow disabled"><i class="fas fa-arrow-right"></i></span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

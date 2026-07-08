@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Đăng Ký - Hiếu Đặc Sản{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <!-- Cột trái: Ảnh nền -->
+        <div class="auth-left">
+            <div class="auth-logo-overlay">
+                <img src="{% static 'images/logo.png' %}" alt="Logo Hiếu Đặc Sản">
+            </div>
+        </div>
+        
+        <!-- Cột phải: Form -->
+        <div class="auth-right">
+            <h2 class="auth-title">ĐĂNG KÝ</h2>
+            
+
+
+            <form action="{% url 'register' %}" method="POST" class="auth-form auth-register-form">
+                {% csrf_token %}
+                
+                <div class="input-field">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" name="username" placeholder="Vd:VucaoKhai" required class="auth-input-plain">
+                </div>
+                
+                <div class="input-field">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Vd:khaideptrai@gmail.com" required class="auth-input-plain">
+                </div>
+                
+                <div class="input-field">
+                    <label>Mật khẩu</label>
+                    <input type="password" name="password" placeholder="Vd:Caokhai123" required class="auth-input-plain">
+                </div>
+                
+                <div class="input-field">
+                    <label>Nhập lại mật khẩu</label>
+                    <input type="password" name="re_password" placeholder="Vd:Caokhai123" required class="auth-input-plain">
+                </div>
+                
+                <div class="auth-actions-center">
+                    <button type="submit" class="btn-auth">ĐĂNG KÝ</button>
+                </div>
+                
+                <div class="auth-switch center-text">
+                    Đã có tài khoản? <a href="{% url 'login' %}" class="switch-link">ĐĂNG NHẬP</a>
+                </div>
+            </form>
+            
+            <div class="social-login-section">
+                <div class="social-text">Hoặc đăng nhập với</div>
+                <div class="social-buttons">
+                    <a href="#" class="btn-social btn-google">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google"> Google
+                    </a>
+                    <a href="#" class="btn-social btn-facebook">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook"> Facebook
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

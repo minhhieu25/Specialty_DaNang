@@ -1,0 +1,63 @@
+{% load static %}
+<header class="site-header new-layout">
+    <div class="container header-container">
+        <div class="logo">
+            <a href="/">
+                <img src="{% static 'images/logo.png' %}" alt="Hiếu Đặc Sản">
+                <span>HIẾU ĐẶC SẢN</span>
+            </a>
+        </div>
+        
+        <nav class="main-nav">
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">TRANG CHỦ</a></li>
+                <li><a href="{% url 'about' %}" class="{% if request.path == '/gioi-thieu/' %}active{% endif %}">GIỚI THIỆU</a></li>
+                <li class="dropdown">
+                    <a href="{% url 'product_list' %}" class="{% if '/san-pham/' in request.path %}active{% endif %}">SẢN PHẨM <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'product_list' %}">Tất cả sản phẩm</a></li>
+                        {% for cat in global_categories %}
+                            <li><a href="{% url 'product_list_by_category' cat.slug %}">{{ cat.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li><a href="{% url 'blog_list' %}" class="{% if '/tin-tuc/' in request.path %}active{% endif %}">TIN TỨC</a></li>
+                <li><a href="{% url 'contact' %}" class="{% if request.path == '/lien-he/' %}active{% endif %}">LIÊN HỆ</a></li>
+                <li><a href="{% url 'cart_detail' %}" class="{% if request.path == '/gio-hang/' %}active{% endif %}">GIỎ HÀNG</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <div class="search-bar">
+                <form action="/search" method="GET">
+                    <input type="text" name="q" placeholder="Tìm kiếm">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            
+            <div class="user-profile" style="position: relative; display: flex; align-items: center; gap: 8px;">
+                {% if request.user.is_authenticated %}
+                    <div style="cursor: pointer; display: flex; align-items: center;" onclick="var d = document.getElementById('user-dropdown'); if(d.style.display === 'none' || d.style.display === '') { d.style.display = 'block'; } else { d.style.display = 'none'; }">
+                        <div style="display: flex; justify-content: center; align-items: center; width: 35px; height: 35px; border-radius: 50%; background-color: #e0e0e0; margin-right: 8px;">
+                            <i class="fas fa-user" style="color: #d1561f; font-size: 16px;"></i>
+                        </div>
+                        <span class="username" style="font-weight: 600;">{{ request.user.username }}</span>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 5px; color: #666;"></i>
+                    </div>
+                    <div id="user-dropdown" class="user-dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 8px; padding: 10px 0; width: 180px; z-index: 100; margin-top: 15px; border: 1px solid #eee;">
+                        <a href="{% url 'profile' %}" style="color: #333; text-decoration: none; display: block; padding: 10px 20px; transition: background 0.2s;"><i class="fas fa-user-circle" style="width: 20px; color: #666;"></i> Hồ sơ của tôi</a>
+                        <a href="{% url 'my_orders' %}" style="color: #333; text-decoration: none; display: block; padding: 10px 20px; transition: background 0.2s;"><i class="fas fa-box-open" style="width: 20px; color: #666;"></i> Đơn hàng của tôi</a>
+                        <a href="{% url 'cart_detail' %}" style="color: #333; text-decoration: none; display: block; padding: 10px 20px; transition: background 0.2s;"><i class="fas fa-shopping-cart" style="width: 20px; color: #666;"></i> Giỏ hàng</a>
+                        <a href="{% url 'change_password' %}" style="color: #333; text-decoration: none; display: block; padding: 10px 20px; transition: background 0.2s;"><i class="fas fa-lock" style="width: 20px; color: #666;"></i> Đổi mật khẩu</a>
+                        <div style="border-top: 1px solid #eee; margin: 5px 0;"></div>
+                        <a href="{% url 'logout' %}" style="color: #e74c3c; text-decoration: none; display: block; padding: 10px 20px; transition: background 0.2s;"><i class="fas fa-sign-out-alt" style="width: 20px;"></i> Đăng xuất</a>
+                    </div>
+                {% else %}
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="{% url 'login' %}" style="padding: 8px 15px; border: 1px solid #d1561f; color: #d1561f; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px;">Đăng nhập</a>
+                        <a href="{% url 'register' %}" style="padding: 8px 15px; background-color: #d1561f; color: white; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px;">Đăng ký</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
